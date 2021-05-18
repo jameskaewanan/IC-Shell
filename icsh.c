@@ -23,8 +23,7 @@ void commandHandler(char**currentInput, char **previousInput) {
 	
 	if (!strcmp("exit", command)) {
 		printf("See you next time! \n");
-		exit(0);
-		return;
+		return exit((u_int8_t)atoi(phrase));
 	}
 	
 	else { printf("Bad command \n"); }
