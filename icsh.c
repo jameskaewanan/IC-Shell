@@ -27,7 +27,7 @@ void commandHandler(char**currentInput, char **previousInput) {
 		return;
 	}
 	
-	else {printf("Bad command \n");}
+	else { printf("Bad command \n"); }
 
 	return;
 }
@@ -35,14 +35,14 @@ void commandHandler(char**currentInput, char **previousInput) {
 
 void shell_loop() {
 
-	char *currentInput = malloc(sizeof(char)* 1000);
-	char *previousInput = malloc(sizeof(char)* 1000);
+	char *currentInput = malloc(sizeof(char) * 1000);
+	char *previousInput = malloc(sizeof(char) * 1000);
 
 	while(1) {
 		printf("icsh $ >> ");
 		
 		fgets(currentInput, 1000, stdin);
-		if (!strcmp(currentInput, "\n")) {continue;}
+		if (!strcmp(currentInput, "\n")) { continue; }
 		
 		else {
 		commandHandler(&currentInput, &previousInput);
@@ -54,9 +54,29 @@ void shell_loop() {
 }
 
 
+void scriptReader(char **directory) {
+
+	FILE *file;
+	file = fopen(*directory, "r");
+	char *currentLine = malloc(sizeof(char) * 1000);
+	char *previousLine = malloc(sizeof(char) * 1000);
+	
+	if (file == NULL) { exit(EXIT_FAILURE); }
+	
+	while(fgets(currentLine, 1000, file) != NULL) {
+		//printf(currentLine);
+		commandHandler(&currentLine, &previousLine);
+		strcpy(previousLine, currentLine);
+	}
+	return;
+}
+
 int main (int arg, char *argv[]) {
+
+	if (arg > 1) { scriptReader(&argv[1]); }
+	
 	printf("Starting IC shell\n");
 	shell_loop();
-
+	
 }
 
