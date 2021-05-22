@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include <time.h>
 
 void commandHandler(char**currentInput, char **previousInput) {
 	char temp[1000];
@@ -105,9 +105,17 @@ void scriptReader(char **directory) {
 }
 
 int main (int arg, char *argv[]) {
-
-	printf("Starting IC shell...\n");
-	printf("\n");
+	
+	printf("Initialising IC Shell. . . \n \n");
+	
+	FILE *file;
+	file = fopen("welcome.txt", "r");
+	char read_string[1000];
+	
+	while(fgets(read_string,sizeof(read_string), file) != NULL)
+ 		printf("%s", read_string);
+ 		
+ 	fclose(file);
 
 	if (arg > 1) { scriptReader(&argv[1]); }
 	
