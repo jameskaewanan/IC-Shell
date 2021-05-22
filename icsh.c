@@ -13,22 +13,59 @@ void commandHandler(char**currentInput, char **previousInput) {
 	
 	if (!strcmp("echo", command)) {
 		printf(phrase, "\n");
+		printf("\n");
 		return;
 	}
 	
 	if (!strcmp("!!\n", command)) {
 		printf(*previousInput);
+		printf("\n");
 		return;
 	}
 	
 	if (!strcmp("exit", command)) {
 		printf("See you next time! \n");
+		printf("\n");
 		return exit((u_int8_t)atoi(phrase));
 	}
 	
-	else { printf("Bad command \n"); }
+	else {	
+		char args[1000];
+		sprintf(args, phrase);
 
+		int pid = fork();
+		
+		if (pid < 0) {
+			printf("Error, Fork Failed\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		if (pid == 0) {
+			temp[strcspn(temp, "\n")] = 0;
+			temp[strlen(temp)] = '\0';
+			args[strcspn(args, "\n")] = 0;
+			args[strlen(args)] = '\0';
+			
+			char *arg[3];
+			arg[0] = temp;
+			
+			if (strlen(args) > 1) { arg[1] = args; }
+			else { arg[1] = NULL; }
+			
+			arg[2] = NULL;
+			
+			if (execvp(temp, arg) < 0) {
+				printf("Bad command, please try again. \n");
+				printf("\n");
+			}
+			else { execvp(temp, arg); }
+			exit(1);
+		}
+		
+		if (pid > 0) { waitpid(pid, NULL, 0); }
+	}
 	return;
+
 }
 
 
@@ -47,11 +84,8 @@ void shell_loop() {
 		commandHandler(&currentInput, &previousInput);
 		strcpy(previousInput, currentInput);
 		}
-
 	}
-
 }
-
 
 void scriptReader(char **directory) {
 
@@ -72,9 +106,12 @@ void scriptReader(char **directory) {
 
 int main (int arg, char *argv[]) {
 
+	printf("Starting IC shell...\n");
+	printf("\n");
+
 	if (arg > 1) { scriptReader(&argv[1]); }
 	
-	printf("Starting IC shell\n");
+
 	shell_loop();
 	
 }
