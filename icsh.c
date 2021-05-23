@@ -3,6 +3,24 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <signal.h>
+
+pid_t child;
+int exitCode = 0;
+
+void signalHandler(int sig) {
+
+	if (sig == 2) {
+		printf(" Caught signal %d, killing foreground process...\n", sig);
+		kill(child, SIGINT);
+	}
+	
+	if (sig == 20) {
+		printf(" Caught signal %d, suspending foreground process...\n", sig);
+		kill(child, SIGTSTP);
+	}
+	
+}
 
 void commandHandler(char**currentInput, char **previousInput) {
 	char temp[1000];
@@ -11,15 +29,30 @@ void commandHandler(char**currentInput, char **previousInput) {
 	char *command = strtok(temp, " ");
 	char *phrase = strtok(NULL, "");
 	
-	if (!strcmp("echo", command)) {
-		printf(phrase, "\n");
+	if (!strcmp("echo\n", temp) || !strcmp("echo ", temp)) {
 		printf("\n");
+		exitCode = 0;
 		return;
+	}
+	
+	if (!strcmp("echo", command)) {
+		if (!strcmp("$?\n", phrase)) {
+			printf("%i\n", exitCode);
+			printf("\n");
+			return;
+		}
+		else {
+			printf(phrase, "\n");
+			printf("\n");
+			exitCode = 0;
+			return;
+		}
 	}
 	
 	if (!strcmp("!!\n", command)) {
 		printf(*previousInput);
 		printf("\n");
+		exitCode = 0;
 		return;
 	}
 	
@@ -62,12 +95,26 @@ void commandHandler(char**currentInput, char **previousInput) {
 			exit(1);
 		}
 		
-		if (pid > 0) { waitpid(pid, NULL, 0); }
+		if (pid > 0) { 
+		
+			struct sigaction sigtstp;
+			struct sigaction sigint;
+		
+			sigtstp.sa_handler = signalHandler;
+			sigint.sa_handler = signalHandler;
+			
+			child = pid;
+			int status;
+		
+			while (waitpid(pid, &status, WNOHANG) == 0) {
+				sigaction(SIGINT, &sigint, NULL);
+				sigaction(SIGTSTP, &sigtstp, NULL);	
+			}
+			return;	
+		}
+		return;
 	}
-	return;
-
 }
-
 
 void shell_loop() {
 
@@ -104,8 +151,12 @@ void scriptReader(char **directory) {
 	return;
 }
 
+void nullSignal(int sig) { 
+	return;
+}
+
 int main (int arg, char *argv[]) {
-	
+
 	printf("Initialising IC Shell. . . \n \n");
 	
 	FILE *file;
@@ -119,7 +170,15 @@ int main (int arg, char *argv[]) {
 
 	if (arg > 1) { scriptReader(&argv[1]); }
 	
-
+	struct sigaction sigtstp_default;
+	struct sigaction sigint_default;
+	
+	sigtstp_default.sa_handler = nullSignal;
+	sigint_default.sa_handler = nullSignal;
+	
+	sigaction(SIGTSTP, &sigtstp_default, NULL);
+	sigaction(SIGINT, &sigint_default, NULL);
+	
 	shell_loop();
 	
 }
