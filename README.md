@@ -15,16 +15,14 @@ An individual project developing a shell in C language. For the Principles of Co
 * __Version 0.2.0__
   * Implementation of Milestone 2
     * Implemented the ability to read scripts, scriptReader()
-  * Minor bug fixes for Milestone 1
   * Added test script for Milestone 2, test.sh
 
 * __Version 0.2.1__
-  * Minor bug fixes
+  * Fixed an issue where "exit" would not return the correct exit code
 
 * __Version 0.3.0__
   * Implementation of Milestone 3
     * Implemented the ability to run external programs/system calls in the foreground
-  * Minor bug fixes
   * Updated test script for Milestone 2, test.sh
 
 * __Version 0.3.1__
