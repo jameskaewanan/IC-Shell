@@ -16,6 +16,7 @@ An individual project developing a shell in C language. For the Principles of Co
   * Implementation of Milestone 2
     * Implemented the ability to read scripts, scriptReader()
   * Minor bug fixes for Milestone 1
+  * Added test script for Milestone 2, test.sh
 
 * Version 0.2.1
   * Minor bug fixes
@@ -24,6 +25,7 @@ An individual project developing a shell in C language. For the Principles of Co
   * Implementation of Milestone 3
     * Implemented the ability to run external programs/system calls in the foreground
   * Minor bug fixes
+  * Updated test script for Milestone 2, test.sh
 
 * Version 0.3.1
   * Implemented a title screen, welcome.txt
