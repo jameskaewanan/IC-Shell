@@ -28,6 +28,12 @@ An individual project developing a shell in C language. For the Principles of Co
 * __Version 0.3.1__
   * Implemented a title screen, welcome.txt
 
+* __Version 0.4.0__
+   * Implementation of Milestone 4
+      * Implemeted signal handlers for SIGINT and SIGTSTP, signalHandler()
+      * Implemented "echo $?" command to check exit code for previous command
+      * Extremely buggy, but atleast it's something? ¯\_(ツ)_/¯
+
 # Bonus Implementations #
 
 * __A title screen__
