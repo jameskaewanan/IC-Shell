@@ -53,7 +53,7 @@ void commandHandler(char**currentInput, char **previousInput) {
 		printf(*previousInput);
 		printf("\n");
 		exitCode = 0;
-		return;
+		return commandHandler(previousInput, currentInput);
 	}
 	
 	if (!strcmp("exit", command)) {
