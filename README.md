@@ -34,6 +34,9 @@ An individual project developing a shell in C language. For my University's Prin
     * Implemented "echo $?" command to return exit code of previous command
   * Added global exitCode
   * Extremely buggy but atleast it's something? ¯\_(ツ)_/¯
+  
+* __Version 0.4.1__
+  * Addressed an oversight where "!!" returns the previous command but does not repeat said command
 
 # Bonus Implementations #
 
