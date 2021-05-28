@@ -4,6 +4,11 @@
 #include <ctype.h>
 #include <time.h>
 #include <signal.h>
+#include <stdbool.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 pid_t child;
 int exitCode = 0;
@@ -22,12 +27,87 @@ void signalHandler(int sig) {
 	
 }
 
-void commandHandler(char**currentInput, char **previousInput) {
+void redirection(char **currentInput, char **previousInput) {
+
+	char temp[1000];
+	strcpy(temp, *currentInput);
+
+	if (strstr(*currentInput, " > ") != NULL) { 
+	
+		char *fileLocation = strchr(temp, '>');
+		fileLocation = strchr(fileLocation, ' ');
+		fileLocation = strtok(fileLocation, " ");
+		fileLocation[strcspn(fileLocation, "\n")] = 0;
+		fileLocation[strlen(fileLocation)] = '\0';
+		
+		char *command = strtok(temp, ">");
+		command[strcspn(command, "\n")] = 0;
+		command[strlen(command)-1] = '\0';
+		
+		int file = open(fileLocation, O_WRONLY | O_CREAT, 0666);
+		
+		int out = dup(1);
+		
+		dup2(file,1);
+		
+		exitCode = commandHandler(&command, &previousInput);
+		
+		dup2(out, 1);
+		close(file);
+		close(out);
+		
+		printf("File created and contents saved successfully. \n");
+		
+		return;
+		
+		if (file < 0) {
+			printf("Unable to create a file. \n");
+			return;
+		}
+	}
+	
+	if (strstr(*currentInput, " < ") != NULL) {
+	
+		char *fileLocation = strchr(temp, '<');
+		fileLocation = strchr(fileLocation, ' ');
+		fileLocation = strtok(fileLocation, " ");
+		fileLocation[strcspn(fileLocation, "\n")] = 0;
+		fileLocation[strlen(fileLocation)] = '\0';
+		
+		FILE *file;
+		file = fopen(fileLocation, "r");
+		char *currentLine = malloc(sizeof(char) * 1000);
+		char *previousLine = malloc(sizeof(char) * 1000);
+	
+		if (file == NULL) { exit(EXIT_FAILURE); }
+	
+		while(fgets(currentLine, 1000, file) != NULL) {
+			commandHandler(&currentLine, &previousLine);
+			strcpy(&previousLine, &currentLine);
+		}
+		
+		return;
+		
+		if (file < 0) {
+			printf("Unable to locate the file. \n");
+			return;
+		}
+	
+	}
+}
+
+
+void commandHandler(char **currentInput, char **previousInput) {
 	char temp[1000];
 	strcpy(temp, *currentInput);
 	
 	char *command = strtok(temp, " ");
 	char *phrase = strtok(NULL, "");
+
+	if (strstr(*currentInput, " > ") != NULL || strstr(*currentInput, " < ") != NULL) { 
+		redirection(currentInput, previousInput);
+		return;
+	}
 	
 	if (!strcmp("echo\n", temp) || !strcmp("echo ", temp)) {
 		printf("\n");
@@ -128,9 +208,10 @@ void shell_loop() {
 		if (!strcmp(currentInput, "\n")) { continue; }
 		
 		else {
-		commandHandler(&currentInput, &previousInput);
-		strcpy(previousInput, currentInput);
-		}
+			commandHandler(&currentInput, &previousInput);
+			strcpy(previousInput, currentInput);
+		}		
+		
 	}
 }
 
@@ -144,14 +225,9 @@ void scriptReader(char **directory) {
 	if (file == NULL) { exit(EXIT_FAILURE); }
 	
 	while(fgets(currentLine, 1000, file) != NULL) {
-		//printf(currentLine);
 		commandHandler(&currentLine, &previousLine);
 		strcpy(previousLine, currentLine);
 	}
-	return;
-}
-
-void nullSignal(int sig) { 
 	return;
 }
 
@@ -173,8 +249,8 @@ int main (int arg, char *argv[]) {
 	struct sigaction sigtstp_default;
 	struct sigaction sigint_default;
 	
-	sigtstp_default.sa_handler = nullSignal;
-	sigint_default.sa_handler = nullSignal;
+	sigtstp_default.sa_handler = SIG_IGN;
+	sigint_default.sa_handler = SIG_IGN;
 	
 	sigaction(SIGTSTP, &sigtstp_default, NULL);
 	sigaction(SIGINT, &sigint_default, NULL);
