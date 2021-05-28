@@ -37,6 +37,11 @@ An individual project developing a shell in C language. For my University's Prin
   
 * __Version 0.4.1__
   * Addressed an oversight where "!!" returns the previous command but does not repeat said command
+  
+* __Version 0.5.0__
+  * Implementation of Milestone 5
+    * Input/Output Redirection, redirection()
+    * Works well but still some issues such as Input Redirection not being properly implemented
 
 # Bonus Implementations #
 
