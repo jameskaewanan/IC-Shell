@@ -33,7 +33,7 @@ void signalHandler(int sig) {
 	
 }
 
-void redirection(char **currentInput, char **previousInput) {
+void redirectionHandler(char **currentInput, char **previousInput) {
 
 	char temp[BUFFER_SIZE];
 	strcpy(temp, *currentInput);
@@ -109,7 +109,7 @@ void commandHandler(char **currentInput, char **previousInput) {
 	char *phrase = strtok(NULL, "");
 
 	if (strstr(*currentInput, " > ") != NULL || strstr(*currentInput, " < ") != NULL) { 
-		redirection(currentInput, previousInput);
+		redirectionHandler(currentInput, previousInput);
 		return;
 	}
 	
