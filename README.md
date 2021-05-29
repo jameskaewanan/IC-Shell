@@ -42,6 +42,12 @@ An individual project developing a shell in C language. For my University's Prin
   * Implementation of Milestone 5
     * Input/Output Redirection, redirection()
     * Works well but still some issues such as Input Redirection not being properly implemented
+    
+* __Version 0.5.1__
+  * Minor clean-up of the code and small visual improvements to outputs
+  * Change input prompt's colour to blue for easier comprehension
+  * Fixed an issue where system calls are not properlly handled (all system calls should now work without issue)
+  
 
 # Bonus Implementations #
 
