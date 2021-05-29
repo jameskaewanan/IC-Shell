@@ -50,7 +50,8 @@ An individual project developing a shell in C language. For my University's Prin
   * Input Redirection has been fully implemented should now function accordingly
   
 
-# Bonus Implementations #
+# Bonus Implementations (Milestone 7) #
 
 * __A title screen__
+* __Changed input prompt to blue__
 
