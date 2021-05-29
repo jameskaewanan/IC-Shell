@@ -10,18 +10,24 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+#define BUFFER_SIZE 	9999
+
+#define BLUE 		"\033[1;34m"
+#define D_COLOUR 	"\033[0m"
+
 pid_t child;
 int exitCode = 0;
+
 
 void signalHandler(int sig) {
 
 	if (sig == 2) {
-		printf(" Caught signal %d, killing foreground process...\n", sig);
-		kill(child, SIGINT);
+		printf("\n\nCaught signal %d, killing foreground process...\n\n", sig);
+		kill(child, SIGKILL);
 	}
 	
 	if (sig == 20) {
-		printf(" Caught signal %d, suspending foreground process...\n", sig);
+		printf("\n\nCaught signal %d, suspending foreground process...\n\n", sig);
 		kill(child, SIGTSTP);
 	}
 	
@@ -29,7 +35,7 @@ void signalHandler(int sig) {
 
 void redirection(char **currentInput, char **previousInput) {
 
-	char temp[1000];
+	char temp[BUFFER_SIZE];
 	strcpy(temp, *currentInput);
 
 	if (strstr(*currentInput, " > ") != NULL) { 
@@ -56,12 +62,12 @@ void redirection(char **currentInput, char **previousInput) {
 		close(file);
 		close(out);
 		
-		printf("File created and contents saved successfully. \n");
+		printf("\nFile created and contents saved successfully. \n\n");
 		
 		return;
 		
 		if (file < 0) {
-			printf("Unable to create a file. \n");
+			printf("\nUnable to create a file. \n\n");
 			return;
 		}
 	}
@@ -76,12 +82,12 @@ void redirection(char **currentInput, char **previousInput) {
 		
 		FILE *file;
 		file = fopen(fileLocation, "r");
-		char *currentLine = malloc(sizeof(char) * 1000);
-		char *previousLine = malloc(sizeof(char) * 1000);
+		char *currentLine = malloc(sizeof(char) * BUFFER_SIZE);
+		char *previousLine = malloc(sizeof(char) * BUFFER_SIZE);
 	
 		if (file == NULL) { exit(EXIT_FAILURE); }
 	
-		while(fgets(currentLine, 1000, file) != NULL) {
+		while(fgets(currentLine, BUFFER_SIZE, file) != NULL) {
 			commandHandler(&currentLine, &previousLine);
 			strcpy(&previousLine, &currentLine);
 		}
@@ -89,16 +95,14 @@ void redirection(char **currentInput, char **previousInput) {
 		return;
 		
 		if (file < 0) {
-			printf("Unable to locate the file. \n");
+			printf("\nUnable to locate the file. \n\n");
 			return;
 		}
-	
 	}
 }
 
-
 void commandHandler(char **currentInput, char **previousInput) {
-	char temp[1000];
+	char temp[BUFFER_SIZE];
 	strcpy(temp, *currentInput);
 	
 	char *command = strtok(temp, " ");
@@ -122,8 +126,7 @@ void commandHandler(char **currentInput, char **previousInput) {
 			return;
 		}
 		else {
-			printf(phrase, "\n");
-			printf("\n");
+			printf("\n%s\n", phrase);
 			exitCode = 0;
 			return;
 		}
@@ -137,19 +140,18 @@ void commandHandler(char **currentInput, char **previousInput) {
 	}
 	
 	if (!strcmp("exit", command)) {
-		printf("See you next time! \n");
-		printf("\n");
+		printf("\nSee you next time! \n\n");
 		return exit((u_int8_t)atoi(phrase));
 	}
 	
 	else {	
-		char args[1000];
+		char args[BUFFER_SIZE];
 		sprintf(args, phrase);
 
 		int pid = fork();
 		
 		if (pid < 0) {
-			printf("Error, Fork Failed\n");
+			printf("\nError, Fork Failed\n\n");
 			exit(EXIT_FAILURE);
 		}
 		
@@ -162,14 +164,13 @@ void commandHandler(char **currentInput, char **previousInput) {
 			char *arg[3];
 			arg[0] = temp;
 			
-			if (strlen(args) > 1) { arg[1] = args; }
+			if (strlen(args) > 0) { arg[1] = args; }
 			else { arg[1] = NULL; }
 			
 			arg[2] = NULL;
 			
 			if (execvp(temp, arg) < 0) {
-				printf("Bad command, please try again. \n");
-				printf("\n");
+				printf("\nCould not find command, please try again. \n\n");
 			}
 			else { execvp(temp, arg); }
 			exit(1);
@@ -198,20 +199,22 @@ void commandHandler(char **currentInput, char **previousInput) {
 
 void shell_loop() {
 
-	char *currentInput = malloc(sizeof(char) * 1000);
-	char *previousInput = malloc(sizeof(char) * 1000);
+	char *currentInput = malloc(sizeof(char) * BUFFER_SIZE);
+	char *previousInput = malloc(sizeof(char) * BUFFER_SIZE);
 
 	while(1) {
+	
+		printf(BLUE);
 		printf("icsh $ >> ");
+		fgets(currentInput, BUFFER_SIZE, stdin);
+		printf(D_COLOUR);
 		
-		fgets(currentInput, 1000, stdin);
 		if (!strcmp(currentInput, "\n")) { continue; }
 		
 		else {
 			commandHandler(&currentInput, &previousInput);
 			strcpy(previousInput, currentInput);
 		}		
-		
 	}
 }
 
@@ -219,12 +222,12 @@ void scriptReader(char **directory) {
 
 	FILE *file;
 	file = fopen(*directory, "r");
-	char *currentLine = malloc(sizeof(char) * 1000);
-	char *previousLine = malloc(sizeof(char) * 1000);
+	char *currentLine = malloc(sizeof(char) * BUFFER_SIZE);
+	char *previousLine = malloc(sizeof(char) * BUFFER_SIZE);
 	
 	if (file == NULL) { exit(EXIT_FAILURE); }
 	
-	while(fgets(currentLine, 1000, file) != NULL) {
+	while(fgets(currentLine, BUFFER_SIZE, file) != NULL) {
 		commandHandler(&currentLine, &previousLine);
 		strcpy(previousLine, currentLine);
 	}
@@ -232,12 +235,14 @@ void scriptReader(char **directory) {
 }
 
 int main (int arg, char *argv[]) {
+	
+	system("clear");
 
 	printf("Initialising IC Shell. . . \n \n");
 	
 	FILE *file;
 	file = fopen("welcome.txt", "r");
-	char read_string[1000];
+	char read_string[BUFFER_SIZE];
 	
 	while(fgets(read_string,sizeof(read_string), file) != NULL)
  		printf("%s", read_string);
@@ -246,8 +251,7 @@ int main (int arg, char *argv[]) {
 
 	if (arg > 1) { scriptReader(&argv[1]); }
 	
-	struct sigaction sigtstp_default;
-	struct sigaction sigint_default;
+	struct sigaction sigtstp_default, sigint_default;
 	
 	sigtstp_default.sa_handler = SIG_IGN;
 	sigint_default.sa_handler = SIG_IGN;
