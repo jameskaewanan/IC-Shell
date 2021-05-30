@@ -80,24 +80,9 @@ void redirectionHandler(char **currentInput, char **previousInput) {
 		fileLocation[strcspn(fileLocation, "\n")] = 0;
 		fileLocation[strlen(fileLocation)] = '\0';
 		
-		FILE *file;
-		file = fopen(fileLocation, "r");
-		char *currentLine = malloc(sizeof(char) * BUFFER_SIZE);
-		char *previousLine = malloc(sizeof(char) * BUFFER_SIZE);
-	
-		if (file == NULL) { exit(EXIT_FAILURE); }
-	
-		while(fgets(currentLine, BUFFER_SIZE, file) != NULL) {
-			commandHandler(&currentLine, &previousLine);
-			strcpy(&previousLine, &currentLine);
-		}
+		scriptReader(&fileLocation);
 		
 		return;
-		
-		if (file < 0) {
-			printf("\nUnable to locate the file. \n\n");
-			return;
-		}
 	}
 }
 
