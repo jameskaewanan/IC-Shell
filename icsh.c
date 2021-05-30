@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include "advisor.h"
 
 #define BUFFER_SIZE 	9999
 
@@ -60,7 +61,7 @@ void redirectionHandler(char **currentInput, char **previousInput) {
 		
 		dup2(out, 1);
 		close(file);
-		close(out);
+		close(out); 
 		
 		printf("\nFile created and contents saved successfully. \n\n");
 		
@@ -129,6 +130,11 @@ void commandHandler(char **currentInput, char **previousInput) {
 		return exit((u_int8_t)atoi(phrase));
 	}
 	
+	if (!strcmp("advisor\n", command)) {
+		system("clear");
+		return advisor_loop();
+	}
+	
 	else {	
 		char args[BUFFER_SIZE];
 		sprintf(args, phrase);
@@ -191,8 +197,8 @@ void shell_loop() {
 	
 		printf(BLUE);
 		printf("icsh $ >> ");
-		fgets(currentInput, BUFFER_SIZE, stdin);
 		printf(D_COLOUR);
+		fgets(currentInput, BUFFER_SIZE, stdin);
 		
 		if (!strcmp(currentInput, "\n")) { continue; }
 		
