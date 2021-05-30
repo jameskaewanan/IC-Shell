@@ -49,9 +49,14 @@ An individual project developing a shell in C language. For my University's Prin
   * Fixed an issue where system calls are not properlly handled (all system calls should now work without issue)
   * Input Redirection has been fully implemented should now function accordingly
   
+* __Version 0.5.2__
+  * Implemented Advisor (refer to Bonus Implementations to see full documentation)
 
 # Bonus Implementations (Milestone 7) #
 
 * __A title screen__
 * __Changed input prompt to blue__
+* __Advisor__
+  * Accessed via the "advisor" command
+  * Based on the magic 8 ball toy, but featuring YOUR University Student Advisor
 
