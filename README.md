@@ -58,5 +58,5 @@ An individual project developing a shell in C language. For my University's Prin
 * __Changed input prompt to blue__
 * __Advisor__
   * Accessed via the "advisor" command
-  * Based on the magic 8 ball toy, but featuring YOUR University Student Advisor
+  * Based on the Magic 8-ball toy, but featuring YOUR University Student Advisor
 
